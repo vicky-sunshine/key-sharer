@@ -1,0 +1,6 @@
+database:
+  type: "sqlite3"
+  args: "test.db"
+
+server:
+  port: :8080
