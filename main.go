@@ -6,19 +6,14 @@ import (
 	"net/http"
 	"os"
 
+	"keysharer/models"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
 )
-
-// model
-type User struct {
-	gorm.Model
-	Username string
-	Email    string
-}
 
 // API
 type API struct {
@@ -69,7 +64,7 @@ func NewAPI(v *viper.Viper, db *gorm.DB) *API {
 
 // db init
 func (a *API) initMigration() {
-	a.db.AutoMigrate(&User{})
+	a.db.AutoMigrate(&models.User{})
 }
 
 // route dispather
@@ -87,7 +82,7 @@ func (a *API) registerRoute() {
 
 // TODO: should sperate controllers & models?
 func (a *API) allUsers(c echo.Context) error {
-	var users []User
+	var users []models.User
 	a.db.Find(&users)
 	return c.JSON(http.StatusOK, users)
 }
@@ -95,7 +90,7 @@ func (a *API) allUsers(c echo.Context) error {
 func (a *API) getUser(c echo.Context) error {
 	username := c.Param("username")
 
-	var user User
+	var user models.User
 	a.db.Where("username=?", username).Find(&user)
 	return c.JSON(http.StatusOK, user)
 }
@@ -104,7 +99,7 @@ func (a *API) newUser(c echo.Context) error {
 	username := c.Param("username")
 	email := c.Param("email")
 
-	a.db.Create(&User{Username: username, Email: email})
+	a.db.Create(&models.User{Username: username, Email: email})
 	return c.NoContent(http.StatusOK)
 
 }
@@ -113,7 +108,7 @@ func (a *API) updateUser(c echo.Context) error {
 	username := c.Param("username")
 	email := c.Param("email")
 
-	var user User
+	var user models.User
 	a.db.Where("username=?", username).Find(&user)
 	user.Email = email
 	a.db.Save(&user)
@@ -125,7 +120,7 @@ func (a *API) updateUser(c echo.Context) error {
 func (a *API) deleteUser(c echo.Context) error {
 	username := c.Param("username")
 
-	var user User
+	var user models.User
 	a.db.Where("username=?", username).Find(&user)
 	a.db.Delete(&user)
 	return c.String(http.StatusOK, "ok")
