@@ -4,7 +4,7 @@ Self-train project. To build a key/password/credencial sharing service with gola
 
 current plan stack: (maybe vue?) - echo - gorm - sqlite (in dev phase)
 
-## What's next step 
+## What's next step
 
 - reformat project structure
 - unittest
