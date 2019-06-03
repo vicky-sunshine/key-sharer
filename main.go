@@ -31,7 +31,11 @@ func main() {
 		panic("config file parse fail")
 	}
 
-	us, err := models.NewUserService(vConfig.GetString("database.type"), vConfig.GetString("database.args"))
+	us, err := models.NewUserService(
+		vConfig.GetString("database.type"),
+		vConfig.GetString("database.args"),
+		vConfig.GetString("database.pepper"),
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -45,10 +49,8 @@ func main() {
 	web.Use(middleware.Recover())
 
 	// setup handlers
-	web.GET("/user/:username", usersC.GetUser)
-	web.POST("/user/:username/:email", usersC.CreateUser)
-	web.PUT("/user/:username/:email", usersC.UpdateUser)
-	web.DELETE("/user/:username", usersC.DeleteUser)
+	web.POST("/user", usersC.CreateUser)
+	web.POST("/login", usersC.Login)
 
 	log.Fatal(web.Start(vConfig.GetString("server.port")))
 }

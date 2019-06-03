@@ -1,6 +1,7 @@
 database:
   type: "sqlite3"
   args: "test.db"
+  peper: "some-random-str"
 
 server:
   port: :8080

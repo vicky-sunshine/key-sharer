@@ -7,4 +7,5 @@ require (
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/spf13/viper v1.4.0
 	github.com/valyala/fasttemplate v1.0.1 // indirect
+	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 )
