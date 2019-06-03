@@ -18,47 +18,27 @@ func NewUsers(us *models.UserService) *Users {
 }
 
 func (u *Users) CreateUser(c echo.Context) error {
-	username := c.Param("username")
-	email := c.Param("email")
-	user := models.User{Username: username, Email: email}
-
+	var user models.User
+	if err := c.Bind(&user); err != nil {
+		return err
+	}
 	if err := u.us.Create(&user); err != nil {
-		c.NoContent(http.StatusInternalServerError)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, user)
 }
 
-func (u *Users) GetUser(c echo.Context) error {
-	username := c.Param("username")
-
-	user, err := u.us.ByUsername(username)
-	if err != nil {
-		c.NoContent(http.StatusInternalServerError)
+// Login is used to process the login form when a user
+// tries to log in as an existing user with username & password
+func (u *Users) Login(c echo.Context) error {
+	var user models.User
+	if err := c.Bind(&user); err != nil {
+		return err
 	}
-	return c.JSON(http.StatusOK, user)
-}
-
-func (u *Users) UpdateUser(c echo.Context) error {
-	username := c.Param("username")
-	email := c.Param("email")
-
-	user := models.User{Username: username, Email: email}
-	err := u.us.Update(&user)
-
+	loginedUser, err := u.us.Authenticate(user.Username, user.Password)
 	if err != nil {
-		c.NoContent(http.StatusInternalServerError)
+		return err
 	}
-	return c.JSON(http.StatusOK, user)
-}
-
-func (u *Users) DeleteUser(c echo.Context) error {
-	username := c.Param("username")
-
-	err := u.us.Delete(username)
-	if err != nil {
-		c.NoContent(http.StatusInternalServerError)
-	}
-
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, loginedUser)
 }
