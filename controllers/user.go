@@ -4,7 +4,7 @@ import (
 	"keysharer/models"
 	"net/http"
 
-	"github.com/labstack/echo"
+	"github.com/gin-gonic/gin"
 )
 
 type Users struct {
@@ -17,28 +17,31 @@ func NewUsers(us *models.UserService) *Users {
 	}
 }
 
-func (u *Users) CreateUser(c echo.Context) error {
+func (u *Users) CreateUser(c *gin.Context) {
 	var user models.User
-	if err := c.Bind(&user); err != nil {
-		return err
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	if err := u.us.Create(&user); err != nil {
-		return err
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-
-	return c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user)
 }
 
 // Login is used to process the login form when a user
 // tries to log in as an existing user with username & password
-func (u *Users) Login(c echo.Context) error {
+func (u *Users) Login(c *gin.Context) {
 	var user models.User
-	if err := c.Bind(&user); err != nil {
-		return err
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	loginedUser, err := u.us.Authenticate(user.Username, user.Password)
 	if err != nil {
-		return err
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return c.JSON(http.StatusOK, loginedUser)
+	c.JSON(http.StatusOK, loginedUser)
 }

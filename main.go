@@ -7,8 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -44,13 +43,13 @@ func main() {
 
 	usersC := controllers.NewUsers(us)
 
-	web := echo.New()
-	web.Use(middleware.Logger())
-	web.Use(middleware.Recover())
+	web := gin.Default()
+	web.Use(gin.Logger())
+	web.Use(gin.Recovery())
 
 	// setup handlers
 	web.POST("/user", usersC.CreateUser)
 	web.POST("/login", usersC.Login)
 
-	log.Fatal(web.Start(vConfig.GetString("server.port")))
+	log.Fatal(web.Run(vConfig.GetString("server.port")))
 }

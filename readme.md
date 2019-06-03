@@ -2,7 +2,7 @@
 
 Self-train project. To build a key/password/credencial sharing service with golang.
 
-current plan stack: (maybe vue?) - echo - gorm - sqlite (in dev phase)
+current plan stack: (maybe vue?) - gin - gorm - sqlite (in dev phase)
 
 ## What's next step
 
