@@ -4,12 +4,16 @@ import (
 	"flag"
 	"keysharer/controllers"
 	"keysharer/models"
+	"keysharer/views"
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
 )
+
+// TemplateRenderer is a custom html/template renderer for Echo framework
 
 func main() {
 
@@ -42,14 +46,18 @@ func main() {
 	us.AutoMigrate()
 
 	usersC := controllers.NewUsers(us)
+	staticC := controllers.NewStatic()
 
-	web := gin.Default()
-	web.Use(gin.Logger())
-	web.Use(gin.Recovery())
+	web := echo.New()
+	web.Use(middleware.Logger())
+	web.Use(middleware.Recover())
+
+	web.Renderer = views.NewTemplateRenderer("views/layouts/*.tmpl")
 
 	// setup handlers
+	web.GET("/", staticC.Home)
 	web.POST("/user", usersC.CreateUser)
 	web.POST("/login", usersC.Login)
 
-	log.Fatal(web.Run(vConfig.GetString("server.port")))
+	log.Fatal(web.Start(vConfig.GetString("server.port")))
 }
