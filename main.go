@@ -27,11 +27,11 @@ func main() {
 	vConfig.SetConfigType("yaml")
 	f, err := os.Open(cfgPath)
 	if err != nil {
-		panic("config file not found")
+		log.Fatalf("config file not found", err)
 	}
 	err = vConfig.ReadConfig(f)
 	if err != nil {
-		panic("config file parse fail")
+		log.Fatalf("config file parse fail", err)
 	}
 
 	us, err := models.NewUserService(
@@ -40,10 +40,13 @@ func main() {
 		vConfig.GetString("database.pepper"),
 	)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer us.Close()
-	us.AutoMigrate()
+	err = us.AutoMigrate()
+	if err != nil {
+		log.Fatalf("user service migrate fail", err)
+	}
 
 	usersC := controllers.NewUsers(us)
 	staticC := controllers.NewStatic()
